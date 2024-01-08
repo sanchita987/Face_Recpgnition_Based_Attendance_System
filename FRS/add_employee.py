@@ -1,15 +1,17 @@
 import tkinter as tk
 from tkinter import Label, LabelFrame, Frame, RIDGE, ttk
-from tkinter import Entry
+from tkinter import Entry, Radiobutton, IntVar
+
 
 class AddEmployee:
     def __init__(self, root):
         self.root = root
         self.root.geometry("1440x900+0+0")
         main_Frame = Frame(root, bd=2)
-        main_Frame.place(x=140, y=0, width=1000, height=600)
+        main_Frame.place(x=140, y=0, width=2000, height=1000)
         left_frame = LabelFrame(main_Frame, bd=2, bg="white", relief=RIDGE, text="Employee Details", font=("times new roman", 12, "bold"))
-        left_frame.place(x=10, y=10, width=1050, height=900)
+        left_frame.place(x=50, y=5, width=1060, height=900)
+        
 
         # instance of shared
         from shared import Shared
@@ -95,9 +97,19 @@ class AddEmployee:
 
         work_history_entry = Entry(left_frame, font=("times New roman", 12, "bold"), width=17)
         work_history_entry.grid(row=10, column=1, padx=10, pady=15, sticky=tk.W)
+       # Take Photo Sample Radio Button
+        take_photo_var = IntVar()
+        take_photo_button = Radiobutton(left_frame, text="Take Photo Sample", variable=take_photo_var, value=1, font=("times new roman", 12, "bold"))
+        take_photo_button.grid(row=11, column=0, padx=10, pady=15, sticky=tk.W)
 
+        # No Photo Sample Radio Button
+        no_photo_var = IntVar()
+        no_photo_button = Radiobutton(left_frame, text="No Photo Sample", variable=no_photo_var, value=2, font=("times new roman", 12, "bold"))
+        no_photo_button.grid(row=11, column=1, padx=10, pady=15, sticky=tk.W)
 
 if __name__ == "__main__":
     root = tk.Tk()
     AddEmployee_obj = AddEmployee(root)
     root.mainloop()
+
+       
