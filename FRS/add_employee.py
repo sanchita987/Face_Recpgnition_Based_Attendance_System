@@ -1,16 +1,18 @@
 import tkinter as tk
-from tkinter import Button, Label, LabelFrame, Frame, RIDGE, Radiobutton, StringVar, Text, ttk
+from tkinter import Button, Label, LabelFrame, Frame, RIDGE, Radiobutton, StringVar, Text, ttk,messagebox
 from tkinter import Entry
 from PIL import Image, ImageTk
 from constants import Constants
 import mysql.connector
+from tkinter import END
+
 
 class AddEmployee:
     def __init__(self, root):
         self.root = root
         self.root.geometry("1440x900+0+0")
-        self.root.minsize(1330, 1200)
-        self.root.maxsize(1330,1200)
+        self.root.minsize(1440, 900)
+        self.root.maxsize(1440,900)
 
         #------------Varibales------------
         self.var_department=StringVar()
@@ -22,7 +24,9 @@ class AddEmployee:
         self.var_joined_date=StringVar()
         self.var_salary=StringVar()
         self.var_Emergency_contact=StringVar()
-        self.var_education=StringVar()
+        self.var_employee_id=StringVar()
+        self.var_radio1=StringVar()
+ 
         
         #Background Image
         img = Image.open("C:\\Users\\ASUS\\Desktop\\FRS\\FRS\\Images\\splash-bg.png")
@@ -71,7 +75,7 @@ class AddEmployee:
         gender_label = Label(left_frame, text="Gender", font=(Constants.Add_Employee_font , 15, ),bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
         gender_label.grid(row=1, column=2, padx=10, pady=15)
         gender_combo = ttk.Combobox(left_frame,textvariable=self.var_gender, font=(Constants.Add_Employee_font , 12, "bold"), width=28, state="readonly")
-        gender_combo["values"] = ( "Male", "Female","Other")
+        gender_combo["values"] = ("Select Gender" ,"Male", "Female","Other")
         gender_combo.current(0)
         gender_combo.grid(row=1, column=3, padx=2, pady=15, sticky=tk.W)
 
@@ -105,19 +109,19 @@ class AddEmployee:
         emergency_entry = ttk.Entry(left_frame, textvariable=self.var_Emergency_contact,font=(Constants.Add_Employee_font , 15 ), width=22 )
         emergency_entry.grid(row=2, column=5, padx=10, pady=15, sticky=tk.W)
 
-        # Educational Background
-        education_label = Label(left_frame, text="Educational Background", font=(Constants.Add_Employee_font , 15, ),bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
-        education_label.grid(row=9, column=0, padx=10, pady=15)
+        # Employee_id
+        employee_id_label = Label(left_frame, text="Employee Id", font=(Constants.Add_Employee_font , 15, ),bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
+        employee_id_label.grid(row=9, column=0, padx=10, pady=15)
 
-        education_entry = ttk.Entry(left_frame, textvariable=self.var_education,font=(Constants.Add_Employee_font , 15 ), width=22)
+        education_entry = ttk.Entry(left_frame, textvariable=self.var_employee_id,font=(Constants.Add_Employee_font , 15 ), width=22)
         education_entry.grid(row=9, column=1, padx=10, pady=15, sticky=tk.W)
 
         #radio_buttons1
-        radiobtn1=Radiobutton(left_frame,text="Take Photos", font=(Constants.Add_Employee_font ,15),value="yes",bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
+        radiobtn1=Radiobutton(left_frame,variable=self.var_radio1,text="Take Photos", font=(Constants.Add_Employee_font ,15),value="yes",bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
         radiobtn1.grid(row=10,column=0)
 
-        #radio_buttons1
-        radiobtn2=Radiobutton(left_frame,text="No Photos",font=(Constants.Add_Employee_font ,15), value="yes",bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
+        #radio_buttons2
+        radiobtn2=Radiobutton(left_frame,variable=self.var_radio1,text="No Photos",font=(Constants.Add_Employee_font ,15), value="no",bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
         radiobtn2.grid(row=10,column=1)
 
         #button_frame
@@ -125,7 +129,7 @@ class AddEmployee:
         btn_frame.place(x=40, y=270, width=1100, height=50)
 
         #save_button
-        save_btn=Button(btn_frame, text="Save",font=(Constants.Add_Employee_font ,15),highlightthickness=0)
+        save_btn=Button(btn_frame, text="Save",command=self.add_data,font=(Constants.Add_Employee_font ,15),highlightthickness=0)
         save_btn.grid(row=0,column=1)
 
         #WhiteSpace_between_buttons
@@ -203,12 +207,13 @@ class AddEmployee:
         scroll_x=ttk.Scrollbar(table_frame, orient="horizontal")
         scroll_y=ttk.Scrollbar(table_frame, orient="vertical")
         
-        self.employee_table=ttk.Treeview(table_frame, column=("dep","name","phone","address","email","gender","joined","salary","emergency","education"),xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set,)
+        self.employee_table=ttk.Treeview(table_frame, column=("employee_id","dep","name","phone","address","email","gender","joined","salary","emergency","photo_sample"),xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set,)
         
         scroll_x.pack(side="bottom", fill="x")
         scroll_y.pack(side="right", fill="y")
         scroll_x.config(command=self.employee_table.xview)
         scroll_y.config(command=self.employee_table.yview)
+        self.employee_table.heading("employee_id", text="Employee Id")
         self.employee_table.heading("dep", text="Department ")
         self.employee_table.heading("name", text="Name")
         self.employee_table.heading("phone", text="Phone number")
@@ -218,10 +223,10 @@ class AddEmployee:
         self.employee_table.heading("joined", text="Joined")
         self.employee_table.heading("salary", text="Salary")
         self.employee_table.heading("emergency", text="Emergency Contacts")
-        self.employee_table.heading("education", text="Education")
+        self.employee_table.heading("photo_sample", text="Photo Sample")
         self.employee_table["show"] = "headings"
         
-
+        self.employee_table.column("employee_id",width=100)
         self.employee_table.column("dep",width=200)
         self.employee_table.column("name",width=200)
         self.employee_table.column("phone",width=200)
@@ -231,17 +236,54 @@ class AddEmployee:
         self.employee_table.column("joined",width=200)
         self.employee_table.column("salary",width=200)
         self.employee_table.column("emergency",width=150)
-        self.employee_table.column("education",width=100)
+        self.employee_table.column("photo_sample",width=150)
+        
         self.employee_table.pack(fill="both", expand=1)
+        self.fetch_data()
 
 
-        #------------function declaration-----------------
-        # def add_data(self):
-
-#fetch data
-def fetch_data(self):
-  
+    #------------function declaration-----------------
+    def add_data(self):
+        if self.var_department.get()=="Select Department" or self.var_address.get()=="" or self.var_email.get()=="" or self.var_employee_id.get()=="" or self.var_gender.get()=="Select Gender" or self.var_joined_date.get()=="" or self.var_phone_number.get()==""or self.var_Emergency_contact.get()=="" or self.var_salary.get()=="":
+           messagebox.showerror("Error","All fields are required",parent=self.root)
+        else:
+            try:
+                conn=mysql.connector.connect(host="localhost",username="root",password="SANCHITA@123",database="face_recognizer")
+                my_cursor=conn.cursor()
+                my_cursor.execute("insert into employee values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(
+                self.var_employee_id.get(),
+                self.var_department.get(),
+                self.var_name.get(),
+                self.var_phone_number.get(),
+                self.var_address.get(),
+                self.var_email.get(),
+                self.var_gender.get(),
+                self.var_joined_date.get(),
+                self.var_salary.get(),
+                self.var_Emergency_contact.get(),
+                self.var_radio1.get()))
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                messagebox.showinfo("Success","All details added",parent=self.root)
+            except Exception as e:
+                messagebox.showerror("Error",str(e), parent=self.root)
+#================fetch data===============#
+    def fetch_data(self):
+     conn=mysql.connector.connect(host="localhost",username="root",password="SANCHITA@123",database="face_recognizer")
+     my_cursor=conn.cursor()
+     my_cursor.execute("select * from employee")
+     data=my_cursor.fetchall()
+     
+     if len(data)!=0:
+         self.employee_table.delete(*self.employee_table.get_children())
+         for i in data:
+             self.employee_table.insert("",END, values=i)
+         conn.commit()
+         conn.close()
+    
       
+            
 if __name__ == "__main__":
     root = tk.Tk()
     AddEmployee_obj = AddEmployee(root)
