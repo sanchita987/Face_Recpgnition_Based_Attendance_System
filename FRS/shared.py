@@ -15,7 +15,7 @@ class Shared:
         self.shared_frame = Frame(root, bg=Constants.shared_background_color)
         self.shared_frame.place(x=0, y=0, width=190, height=900)
         #logo
-        logo_img = Image.open(r"C:\Users\ASUS\Downloads\FRS\FRS\Images\rps_logo-preview.png")
+        logo_img = Image.open("C:\\Users\\ASUS\\Desktop\\FRS\\FRS\\Images\\rps_logo-preview.png")
         logo_img=logo_img.resize((100,45))
         self.logo_img = ImageTk.PhotoImage(logo_img)
 
@@ -85,12 +85,12 @@ class Shared:
             print("clicked face recognition")
     def on_attendance_label_clicked(self,event):
             print("clicked attendance")   
-    def on_Exit_label_clicked(self , event):
-            
+    def on_Exit_label_clicked(event):
             print("clicked exit")
-    # def on_home_label_clicked(event):
-    #         print("clicked")
-
-
-
+   
+print("done")
+if __name__ == "__main__":
+        root = Tk()
+        shared_obj= Shared(root)
+        root.mainloop()
 
