@@ -15,7 +15,7 @@ class AddEmployee:
         self.root.maxsize(1440,900)
 
         #------------Varibales------------
-        self.var_department=StringVar()
+        self.var_dep=StringVar()
         self.var_name=StringVar()
         self.var_phone_number=StringVar()
         self.var_address=StringVar()
@@ -90,7 +90,7 @@ class AddEmployee:
         dep_label = Label(left_frame, text="Department", font=(Constants.Add_Employee_font , 15, ),bg=Constants.content_background_color, fg=Constants.frame_content_text_color)
         dep_label.grid(row=2, column=0, padx=2, pady=15)
 
-        dep_combo = ttk.Combobox(left_frame, textvariable=self.var_department,font=(Constants.Add_Employee_font ,12, "bold"), width=28, state="readonly")
+        dep_combo = ttk.Combobox(left_frame, textvariable=self.var_dep,font=(Constants.Add_Employee_font ,12, "bold"), width=28, state="readonly")
         dep_combo["values"] = ("select Department", "HR", "IT", "Finance", "Marketing", "Operations")
         dep_combo.current(0)
         dep_combo.grid(row=2, column=1, padx=2, pady=15, sticky=tk.W)
@@ -239,12 +239,13 @@ class AddEmployee:
         self.employee_table.column("photo_sample",width=150)
         
         self.employee_table.pack(fill="both", expand=1)
+        self.employee_table.bind("<Button-1>" , self.get_cursor)
         self.fetch_data()
 
 
     #------------function declaration-----------------
     def add_data(self):
-        if self.var_department.get()=="Select Department" or self.var_address.get()=="" or self.var_email.get()=="" or self.var_employee_id.get()=="" or self.var_gender.get()=="Select Gender" or self.var_joined_date.get()=="" or self.var_phone_number.get()==""or self.var_Emergency_contact.get()=="" or self.var_salary.get()=="":
+        if self.var_dep.get()=="Select Department" or self.var_address.get()=="" or self.var_email.get()=="" or self.var_employee_id.get()=="" or self.var_gender.get()=="Select Gender" or self.var_joined_date.get()=="" or self.var_phone_number.get()==""or self.var_Emergency_contact.get()=="" or self.var_salary.get()=="":
            messagebox.showerror("Error","All fields are required",parent=self.root)
         else:
             try:
@@ -252,7 +253,7 @@ class AddEmployee:
                 my_cursor=conn.cursor()
                 my_cursor.execute("insert into employee values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(
                 self.var_employee_id.get(),
-                self.var_department.get(),
+                self.var_dep.get(),
                 self.var_name.get(),
                 self.var_phone_number.get(),
                 self.var_address.get(),
@@ -281,10 +282,31 @@ class AddEmployee:
              self.employee_table.insert("",END, values=i)
          conn.commit()
          conn.close()
-    
-      
+         
+     #============get cursor===========#    
+    def get_cursor(self , event=""):
+        cursor_focus=self.employee_table.focus()
+        content=self.employee_table.item(cursor_focus)
+        data=content["values"]
+        
+        self.var_employee_id.set(data[0]),
+        
+        self.var_dep.set(data[1]),
+        self.var_name.set(data[2]),
+        self.var_phone_number.set(data[3]),
+        self.var_address.set(data[4]),
+        self.var_email.set(data[5]),
+        self.var_gender.set(data[6]),
+        self.var_joined_date.set(data[7]),
+        self.var_salary.set(data[8]),
+        self.var_Emergency_contact.set(data[9]),
+        self.var_radio1.set(data[10])
+     
+     #update function
+       
             
 if __name__ == "__main__":
-    root = tk.Tk()
-    AddEmployee_obj = AddEmployee(root)
-    root.mainloop()
+ root = tk.Tk()
+ AddEmployee_obj = AddEmployee(root)
+ root.mainloop()
+ 
